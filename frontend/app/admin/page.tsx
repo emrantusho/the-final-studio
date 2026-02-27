@@ -1,14 +1,15 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { toast } from "sonner";
 import { useApi } from '@/lib/api';
 
-// Simple placeholder components that use Tailwind classes
-const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => <div className={`bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg ${className}`}>{children}</div>;
-const CardHeader = ({ children }: { children: React.ReactNode }) => <div className="p-6">{children}</div>;
-const CardTitle = ({ children }: { children: React.ReactNode }) => <h2 className="text-xl font-bold text-white">{children}</h2>;
-const CardDescription = ({ children }: { children: React.ReactNode }) => <p className="text-sm text-gray-400 mt-1">{children}</p>;
-const CardContent = ({ children }: { children: React.ReactNode }) => <div className="p-6 pt-0">{children}</div>;
+// --- CORRECTED PLACEHOLDER COMPONENTS ---
+// They now all accept a className prop.
+const Card = ({ children, className }: { children: ReactNode, className?: string }) => <div className={`bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg ${className}`}>{children}</div>;
+const CardHeader = ({ children }: { children: ReactNode }) => <div className="p-6">{children}</div>;
+const CardTitle = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-bold text-white">{children}</h2>;
+const CardDescription = ({ children }: { children: ReactNode }) => <p className="text-sm text-gray-400 mt-1">{children}</p>;
+const CardContent = ({ children, className }: { children: ReactNode, className?: string }) => <div className={`p-6 pt-0 ${className}`}>{children}</div>;
 const Label = ({ children, ...props }: any) => <label className="block mb-2 text-sm font-medium text-gray-300" {...props}>{children}</label>;
 const Input = (props: any) => <input className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" {...props} />;
 const Button = ({ children, ...props }: any) => <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition" {...props}>{children}</button>;
