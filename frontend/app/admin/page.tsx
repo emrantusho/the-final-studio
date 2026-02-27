@@ -73,7 +73,7 @@ export default function AdminPage() {
                                 <div key={provider}>
                                     <Label htmlFor={`key-${provider}`}>{provider.replace(/_/g, ' ')}</Label>
                                     <div className="flex gap-2 mt-1">
-                                        <Input id={`key-${provider}`} type="password" value={apiKeys[provider] || ''} onChange={(e) => setApiKeys(prev => ({...prev, [provider]: e.target.value}))} placeholder={keysPresent.includes(provider) ? '•••••••••••••••• (Saved)' : 'Enter key...'} />
+                                        <Input id={`key-${provider}`} type="password" value={apiKeys[provider] || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiKeys(prev => ({...prev, [provider]: e.target.value}))} placeholder={keysPresent.includes(provider) ? '•••••••••••••••• (Saved)' : 'Enter key...'} />
                                         <Button onClick={() => handleApiKeySave(provider)}>Save</Button>
                                     </div>
                                 </div>
@@ -93,7 +93,7 @@ export default function AdminPage() {
                         </div>
                          <div>
                             <Label htmlFor="github-repo">GitHub Repository URL</Label>
-                            <Input id="github-repo" value={settings.github_repo_url || ''} onBlur={(e) => handleSettingChange('github_repo_url', e.target.value)} onChange={(e) => setSettings(s => ({...s, github_repo_url: e.target.value}))} placeholder="user/repo" />
+                            <Input id="github-repo" value={settings.github_repo_url || ''} onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleSettingChange('github_repo_url', e.target.value)} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettings(s => ({...s, github_repo_url: e.target.value}))} placeholder="user/repo" />
                         </div>
                     </CardContent>
                 </Card>
