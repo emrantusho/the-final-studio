@@ -1,0 +1,1 @@
+{ "compilerOptions": { "target": "esnext", "module": "esnext", "moduleResolution": "bundler", "lib": ["esnext"], "strict": true, "esModuleInterop": true, "skipLibCheck": true, "forceConsistentCasingInFileNames": true, "types": ["@cloudflare/workers-types"] } }

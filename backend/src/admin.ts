@@ -1,0 +1,9 @@
+import { Hono } from 'hono'; import { zValidator } from '@hono/zod-validator'; import type { Env } from './index'; import { SettingsUpdateSchema, KeyUpdateSchema } from './types'; import { encrypt } from './crypto';
+export const adminApp = new Hono<Env>();
+adminApp.get('/settings', async (c) => { const { results } = await c.env.DB.prepare('SELECT key, value FROM app_settings').all(); const settings = (results as {key: string, value: string}[]).reduce((acc: Record<string, string>, { key, value }) => { acc[key] = value; return acc; }, {}); return c.json(settings); });
+adminApp.put('/keys', zValidator('json', KeyUpdateSchema), async (c) => {
+    const { provider_id, api_key } = c.req.valid('json');
+    if (api_key === '') { await c.env.DB.prepare('DELETE FROM secure_keys WHERE provider_id = ?').bind(provider_id).run(); return c.json({ success: true, message: `Key for ${provider_id} deleted.` }); }
+    else { const { encrypted_key_hex, iv_hex } = await encrypt(c.env.SESSION_SECRET, api_key); await c.env.DB.prepare(`INSERT INTO secure_keys (provider_id, encrypted_key_hex, iv_hex) VALUES (?, ?, ?) ON CONFLICT(provider_id) DO UPDATE SET encrypted_key_hex=excluded.encrypted_key_hex, iv_hex=excluded.iv_hex`).bind(provider_id, encrypted_key_hex, iv_hex).run(); return c.json({ success: true, message: `Key for ${provider_id} saved.` }); }
+});
+adminApp.get('/keys', async (c) => { const { results } = await c.env.DB.prepare('SELECT provider_id FROM secure_keys').all<{provider_id: string}>(); return c.json(results.map((r: {provider_id: string}) => r.provider_id)); });
