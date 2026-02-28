@@ -1,7 +1,26 @@
-import { Hono } from 'hono'; import { cors } from 'hono/cors'; import { logger } from 'hono/logger'; import { authApp } from './auth'; import { adminApp } from './admin'; import { authMiddleware } from './middleware';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { authApp } from './auth';
+import { adminApp } from './admin';
+import { authMiddleware } from './middleware';
+
 export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_INDEX: VectorizeIndex; AI: Ai; SESSION_SECRET: string; TURNSTILE_SECRET_KEY: string; GITHUB_TOKEN: string; }; Variables: { user: { id: number; username: string; }; }; };
 const app = new Hono<Env>();
-app.use('*', logger()); app.use('*', cors({ origin: (origin) => origin, allowHeaders: ['Content-Type'], allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'], credentials: true, }));
+
+app.use('*', logger());
+app.use('*', cors({ origin: (origin) => origin, allowHeaders: ['Content-Type'], allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'], credentials: false, }));
+
 app.get('/', (c) => c.json({ status: 'ok', message: 'Backend is live!' }));
-app.route('/auth', authApp); app.use('/admin/*', authMiddleware); app.route('/admin', adminApp);
+
+// API Routes
+app.route('/auth', authApp);
+
+app.use('/admin/*', authMiddleware);
+app.route('/admin', adminApp);
+
+// Future routes would be added here
+// app.use('/chat/*', authMiddleware);
+// app.route('/chat', chatApp);
+
 export default app;

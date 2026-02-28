@@ -2,9 +2,8 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { toast } from "sonner";
 import { useApi } from '@/lib/api';
+import Link from 'next/link';
 
-// --- CORRECTED PLACEHOLDER COMPONENTS ---
-// They now all accept a className prop.
 const Card = ({ children, className }: { children: ReactNode, className?: string }) => <div className={`bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg ${className}`}>{children}</div>;
 const CardHeader = ({ children }: { children: ReactNode }) => <div className="p-6">{children}</div>;
 const CardTitle = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-bold text-white">{children}</h2>;
@@ -34,7 +33,7 @@ export default function AdminPage() {
                 ]);
                 setSettings(settingsData);
                 setKeysPresent(keysData);
-            } catch (error) { toast.error("Failed to load initial admin data."); }
+            } catch (error) { toast.error("Failed to load initial admin data. Ensure you are logged in."); }
             finally { setIsLoading(false); }
         };
         fetchData();
@@ -52,21 +51,28 @@ export default function AdminPage() {
     
     const handleSettingChange = async (key: string, value: string | boolean) => {
         const stringValue = String(value);
-        await api.put('/admin/settings', { key, value: stringValue });
-        toast.success(`Setting '${key}' updated.`);
-        setSettings(prev => ({ ...prev, [key]: stringValue }));
+        try {
+            await api.put('/admin/settings', { key, value: stringValue });
+            toast.success(`Setting '${key}' updated.`);
+            setSettings(prev => ({ ...prev, [key]: stringValue }));
+        } catch(e) {
+            toast.error(`Failed to update setting '${key}'.`);
+        }
     };
 
-    if (isLoading) return <div className="text-white p-8">Loading settings...</div>;
+    if (isLoading) return <div className="bg-gray-900 text-white p-8 min-h-screen">Loading settings...</div>;
 
     return (
         <div className="p-4 sm:p-8 bg-gray-900 min-h-screen text-white">
+            <div className="mb-8">
+                <Link href="/" className="text-blue-400 hover:underline">← Back to Main Studio</Link>
+            </div>
             <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="lg:col-span-2">
                     <CardHeader>
                         <CardTitle>API Key Management</CardTitle>
-                        <CardDescription>Secrets are encrypted at rest on the backend. Leave a key blank and click Save to delete it.</CardDescription>
+                        <CardDescription>Secrets are encrypted at rest. Set them here instead of using `wrangler secret put`.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
