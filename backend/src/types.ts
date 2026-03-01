@@ -5,4 +5,9 @@ export const LoginSchema = z.object({ username: z.string().min(1), password: z.s
 export const SettingsUpdateSchema = z.object({ key: z.string(), value: z.string() });
 export const KeyUpdateSchema = z.object({ provider_id: z.string(), api_key: z.string() });
 // Chat
-export const PostMessageSchema = z.object({ content: z.string().min(1) });
+export const PostMessageSchema = z.object({
+    messages: z.array(z.object({
+        role: z.enum(['system', 'user', 'assistant']),
+        content: z.string()
+    }))
+});
