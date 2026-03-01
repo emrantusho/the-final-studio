@@ -1,12 +1,8 @@
 import { z } from 'zod';
+// Auth
 export const LoginSchema = z.object({ username: z.string().min(1), password: z.string().min(1) });
+// Admin
 export const SettingsUpdateSchema = z.object({ key: z.string(), value: z.string() });
 export const KeyUpdateSchema = z.object({ provider_id: z.string(), api_key: z.string() });
-export const CreateChatSchema = z.object({ title: z.string().min(1), message: z.string().min(1) });
-export const PostMessageSchema = z.object({ chatId: z.string(), content: z.string().min(1) });
-export const InitiateUploadSchema = z.object({ fileName: z.string(), contentType: z.string() });
-export const CompleteUploadSchema = z.object({ fileName: z.string(), uploadId: z.string(), parts: z.array(z.object({ partNumber: z.number(), etag: z.string() })) });
-export const IngestDocumentSchema = z.object({ r2Key: z.string() });
-export const ReadFileSchema = z.object({ path: z.string() });
-export const CommitChangesSchema = z.object({ branch: z.string(), commitMessage: z.string(), changes: z.array(z.object({ path: z.string(), content: z.string()})) });
-export const CreatePRSchema = z.object({ head: z.string(), base: z.string(), title: z.string(), body: z.string() });
+// Chat
+export const PostMessageSchema = z.object({ content: z.string().min(1) });
