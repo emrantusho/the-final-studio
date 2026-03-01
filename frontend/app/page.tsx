@@ -9,15 +9,22 @@ export default function MainPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // When loading is finished, if there is no user, redirect to login.
     if (!isLoading && !user) {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [isLoading, user, router]);
 
+  // Show a loading screen while the AuthContext is initializing.
   if (isLoading || !user) {
-    return <div className="bg-gray-900 min-h-screen flex items-center justify-center text-white">Loading Studio...</div>;
+    return (
+      <div className="bg-gray-900 min-h-screen flex items-center justify-center text-white">
+        Loading Studio...
+      </div>
+    );
   }
 
+  // If we have a user, show the main application.
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <header className="flex items-center justify-between p-4 border-b border-gray-700">
