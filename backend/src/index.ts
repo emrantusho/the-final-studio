@@ -9,18 +9,26 @@ export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_I
 const app = new Hono<Env>();
 
 app.use('*', logger());
-app.use('*', cors({ origin: (origin) => origin, allowHeaders: ['Content-Type'], allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'], credentials: false, }));
+// THE CRUCIAL FIX: This CORS configuration is required for cookies.
+app.use('*', cors({
+  origin: (origin) => {
+    // In production, you would lock this down to your specific frontend URL
+    // For now, this allows any origin from your pages.dev domain.
+    if (origin.endsWith('.pages.dev') || origin === 'http://localhost:3000') {
+      return origin;
+    }
+    return 'https://your-production-domain.com'; // Return a default or deny
+  },
+  allowHeaders: ['Content-Type'],
+  allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true, // This is ESSENTIAL for cookies to be sent and received
+}));
 
 app.get('/', (c) => c.json({ status: 'ok', message: 'Backend is live!' }));
 
 // API Routes
 app.route('/auth', authApp);
-
 app.use('/admin/*', authMiddleware);
 app.route('/admin', adminApp);
-
-// Future routes would be added here
-// app.use('/chat/*', authMiddleware);
-// app.route('/chat', chatApp);
 
 export default app;
