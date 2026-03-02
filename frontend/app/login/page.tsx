@@ -1,10 +1,26 @@
 "use client";
-import { useState } from 'react'; import { useRouter } from 'next/navigation'; import { toast } from 'sonner'; import { useAuth } from '@/lib/AuthContext';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
+
 export default function LoginPage() {
-    const [username, setUsername] = useState('admin'); const [password, setPassword] = useState('admin'); const [isLoading, setIsLoading] = useState(false); const router = useRouter(); const { login } = useAuth();
+    const [username, setUsername] = useState('admin');
+    const [password, setPassword] = useState('admin');
+    const [isLoading, setIsLoading] = useState(false);
+    const { login } = useAuth();
+
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); setIsLoading(true);
-        try { await login(username, password); toast.success("Login successful!"); router.push('/'); } catch (error: any) { toast.error(error.message); } finally { setIsLoading(false); }
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            await login(username, password);
+            toast.success("Login successful!");
+            // Redirection is now handled by the AuthContext
+        } catch (error: any) {
+            toast.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
     return (
         <main style={{display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#111827' }}>
