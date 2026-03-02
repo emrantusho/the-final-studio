@@ -1,23 +1,24 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem('authToken');
+}
+
 class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers = new Headers(options.headers || {});
     if (!(options.body instanceof FormData)) { headers.set('Content-Type', 'application/json'); }
     
-    // THE CRUCIAL FIX: 'credentials: include' tells the browser to send cookies.
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      credentials: 'include',
-      ...options,
-      headers
-    });
+    // Add the Authorization header if a token exists
+    const token = getToken();
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+    }
 
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
     if (!response.ok) {
-        // If the server returns an auth error, log the user out client-side
-        if (response.status === 401) {
-            // This is a simple way to handle expired sessions.
-            // In a real app, you might use the AuthContext's logout function.
-            window.location.href = '/login';
-        }
+        if (response.status === 401) { sessionStorage.removeItem('authToken'); window.location.href = '/login'; }
         let errorData: { error?: string; message?: string } = {};
         try { errorData = await response.json(); } catch (e) { errorData = { message: `HTTP error! status: ${response.status}` }; }
         throw new Error(errorData.error || errorData.message || 'An unknown error occurred');
