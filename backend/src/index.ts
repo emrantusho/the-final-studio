@@ -10,18 +10,17 @@ export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_I
 const app = new Hono<Env>();
 
 app.use('*', logger());
-// THE CRUCIAL FIX: credentials: true is ESSENTIAL for cookies.
+// THE DEFINITIVE FIX: Add 'Authorization' to allowHeaders
 app.use('*', cors({
   origin: (origin) => {
-    // In production, lock this down. For now, this is permissive.
     if (origin.endsWith('.pages.dev') || origin.startsWith('http://localhost')) {
       return origin;
     }
-    return 'https://your-production-domain.com';
+    return 'https://your-production-domain.com'; // A default for safety
   },
-  allowHeaders: ['Content-Type'],
+  allowHeaders: ['Content-Type', 'Authorization'], // <-- THE FIX IS HERE
   allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true, // This tells the server to accept cookies from other domains.
+  credentials: true, // Keep this for potential future cookie use
 }));
 
 app.get('/', (c) => c.json({ status: 'ok', message: 'Backend is live!' }));
