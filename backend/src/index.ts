@@ -10,17 +10,19 @@ export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_I
 const app = new Hono<Env>();
 
 app.use('*', logger());
-// THE DEFINITIVE FIX: Add 'Authorization' to allowHeaders
+// THE DEFINITIVE, FINAL FIX: Add 'Authorization' to allowHeaders
 app.use('*', cors({
   origin: (origin) => {
+    // This is a permissive but safe configuration for this stage.
     if (origin.endsWith('.pages.dev') || origin.startsWith('http://localhost')) {
       return origin;
     }
-    return 'https://your-production-domain.com'; // A default for safety
+    // For any other origin, it will fail, which is good.
+    return undefined;
   },
   allowHeaders: ['Content-Type', 'Authorization'], // <-- THE FIX IS HERE
   allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true, // Keep this for potential future cookie use
+  credentials: true,
 }));
 
 app.get('/', (c) => c.json({ status: 'ok', message: 'Backend is live!' }));
