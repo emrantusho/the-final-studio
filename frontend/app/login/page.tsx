@@ -14,14 +14,15 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             await login(username, password);
-            toast.success("Login successful!");
-            // Redirection is now handled by the AuthContext
+            toast.success("Login successful! Redirecting to Dashboard...");
+            // THE FIX: Force a hard redirect directly to the admin dashboard
+            window.location.href = '/admin';
         } catch (error: any) {
             toast.error(error.message);
-        } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Only stop loading if there is an error
         }
     };
+
     return (
         <main style={{display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#111827' }}>
             <div style={{ background: 'rgba(31, 41, 55, 0.7)', padding: '2rem', borderRadius: '1rem', border: '1px solid rgba(75, 85, 99, 0.5)', color: 'white', width: '380px' }}>
@@ -29,7 +30,7 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div> <label htmlFor="username" style={{display: 'block', marginBottom: '0.5rem'}}>Username</label> <input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required style={{width: '100%', padding: '0.5rem', background: '#374151', border: '1px solid #4b5563', borderRadius: '0.375rem', color: 'white'}} /> </div>
                     <div> <label htmlFor="password" style={{display: 'block', marginBottom: '0.5rem'}}>Password</label> <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{width: '100%', padding: '0.5rem', background: '#374151', border: '1px solid #4b5563', borderRadius: '0.375rem', color: 'white'}} /> </div>
-                    <button type="submit" disabled={isLoading} style={{padding: '0.75rem', background: '#3b82f6', border: 'none', borderRadius: '0.375rem', color: 'white', cursor: 'pointer', opacity: isLoading ? 0.5 : 1, fontWeight: '600', marginTop: '1rem'}}> {isLoading ? 'Signing In...' : 'Sign In'} </button>
+                    <button type="submit" disabled={isLoading} style={{padding: '0.75rem', background: '#3b82f6', border: 'none', borderRadius: '0.375rem', color: 'white', cursor: 'pointer', opacity: isLoading ? 0.5 : 1, fontWeight: '600', marginTop: '1rem'}}> {isLoading ? 'Authenticating...' : 'Sign In'} </button>
                 </form>
             </div>
         </main>
