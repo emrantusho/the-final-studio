@@ -6,28 +6,21 @@ import { adminApp } from './admin';
 import { chatApp } from './chat';
 import { authMiddleware } from './middleware';
 
-export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_INDEX: VectorizeIndex; AI: Ai; SESSION_SECRET: string; TURNSTILE_SECRET_KEY: string; GITHUB_TOKEN: string; }; Variables: { user: { id: number; username: string; }; }; };
+export type Env = { Bindings: { DB: D1Database; R2_BUCKET: R2Bucket; VECTORIZE_INDEX: VectorizeIndex; AI: Ai; SESSION_SECRET: string; GITHUB_TOKEN: string; /* Removed Turnstile for simplicity */}; Variables: { user: { id: number; username: string; }; }; };
 const app = new Hono<Env>();
 
 app.use('*', logger());
-// THE DEFINITIVE, FINAL FIX: Add 'Authorization' to allowHeaders
 app.use('*', cors({
   origin: (origin) => {
-    // This is a permissive but safe configuration for this stage.
-    if (origin.endsWith('.pages.dev') || origin.startsWith('http://localhost')) {
-      return origin;
-    }
-    // For any other origin, it will fail, which is good.
-    return undefined;
+    if (origin.endsWith('.pages.dev') || origin.startsWith('http://localhost')) { return origin; }
+    return undefined; // Block other origins
   },
-  allowHeaders: ['Content-Type', 'Authorization'], // <-- THE FIX IS HERE
+  allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['POST', 'GET', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 }));
 
 app.get('/', (c) => c.json({ status: 'ok', message: 'Backend is live!' }));
-
-// API Routes
 app.route('/auth', authApp);
 app.use('/admin/*', authMiddleware);
 app.route('/admin', adminApp);
